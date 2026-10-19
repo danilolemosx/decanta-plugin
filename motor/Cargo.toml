@@ -1,0 +1,28 @@
+[package]
+name = "tratamento-motor"
+description = "Motor do Tratamento de Áudio 2: DeepFilterNet em 3 níveis + residual, WAV com timecode BWF"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[lib]
+name = "tratamento_motor"
+path = "src/lib.rs"
+
+[[bin]]
+name = "tratamento-cli"
+path = "src/bin/tratamento-cli.rs"
+
+[dependencies]
+# libDF v0.5.6 (não publicado no crates.io nesta versão): mesmo código e modelo do binário de referência
+deep_filter = { git = "https://github.com/Rikorose/DeepFilterNet", tag = "v0.5.6", default-features = false, features = ["tract", "default-model"] }
+ndarray = "0.15"
+anyhow = "1.0"
+thiserror = "1.0"
+png = "0.17"
+mp3lame-encoder = "0.2"
+rustfft = "6.1"
+serde = { version = "1.0", features = ["derive"] }
+
+[build-dependencies]
+cc = "1.0"

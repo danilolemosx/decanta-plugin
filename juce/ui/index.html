@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Decanta</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="marca">DECANTA<span>.</span></div>
+    <span id="selo" class="selo rt">TEMPO REAL</span>
+    <button id="engrenagem" class="engrenagem" title="Ajustes avançados">⚙</button>
+  </header>
+
+  <main id="principal">
+    <div class="secao-tit"><span class="rot">Separação</span></div>
+    <section class="secao">
+      <div class="par-med"><div class="medidores"><i class="medidor" id="medEntrada"></i></div><span class="rot">ENTRA</span></div>
+      <div class="knobs">
+        <div class="knob" data-param="voz" data-tam="78" data-cor="#efe5cf">
+          <svg></svg><span class="v tab"></span><span class="n">VOZ</span><span class="leg">volume da<br>fala limpa</span>
+        </div>
+        <div class="knob grande" data-param="separacao" data-tam="104" data-cor="#d2382f">
+          <svg></svg><span class="v tab"></span><span class="n">SEPARAÇÃO</span><span class="leg">o quanto separar<br>a voz do fundo</span>
+        </div>
+        <div class="knob" data-param="ambiencia" data-tam="78" data-cor="#c9902e">
+          <svg></svg><span class="v tab"></span><span class="n">AMBIÊNCIA</span><span class="leg">volume do<br>fundo retirado</span>
+        </div>
+      </div>
+      <div class="par-med"><div class="medidores"><i class="medidor" id="medSaida"></i></div><span class="rot">SAI</span></div>
+    </section>
+
+    <div class="secao-tit"><span class="rot">Dinâmica da voz</span></div>
+    <section class="dinamica">
+      <div class="knob" data-param="compressao" data-tam="62" data-cor="#efe5cf">
+        <svg></svg><span class="v tab"></span><span class="n">COMPRESSÃO</span>
+      </div>
+      <div class="knob" data-param="ganho" data-tam="62" data-cor="#efe5cf">
+        <svg></svg><span class="v tab"></span><span class="n">GANHO</span>
+      </div>
+      <div class="reducao">
+        <span class="rot">Gain reduction</span>
+        <div class="gr"><i id="gr"></i></div>
+        <div class="escala tab"><span>−20</span><span>−12</span><span>−6</span><span>−3</span><span>0 dB</span></div>
+        <div class="alvo desligado"><i class="chave"></i><span class="rot">Nível final</span><span class="espaco"></span><span class="aviso-alvo">SÓ NO AUDIOSUITE</span></div>
+      </div>
+    </section>
+
+    <footer class="pe">
+      <button id="soFundo" class="tecla"><i class="led"></i>SÓ FUNDO</button>
+      <span class="espaco"></span>
+      <span class="rod" id="rodape">Leva um instante para “pegar” após o play</span>
+    </footer>
+  </main>
+
+  <!-- ajustes avançados -->
+  <div id="avancado" class="avancado oculto">
+    <div class="painel">
+      <h3>COMPRESSOR DA VOZ <em id="modoComp">AUTOMÁTICO</em></h3>
+      <p class="explica">O botão Compressão move estes valores juntos. Mexer em qualquer um aqui passa para o modo manual.</p>
+      <div class="linha" data-param="threshold"><span class="rot">Threshold</span><div class="trilho"><div class="tr"><i></i></div><i class="mc"></i></div><b class="tab"></b></div>
+      <div class="linha" data-param="ratio"><span class="rot">Ratio</span><div class="trilho"><div class="tr"><i></i></div><i class="mc"></i></div><b class="tab"></b></div>
+      <div class="linha" data-param="attack"><span class="rot">Attack</span><div class="trilho"><div class="tr"><i></i></div><i class="mc"></i></div><b class="tab"></b></div>
+      <div class="linha" data-param="release"><span class="rot">Release</span><div class="trilho"><div class="tr"><i></i></div><i class="mc"></i></div><b class="tab"></b></div>
+      <div class="linha" data-param="knee"><span class="rot">Knee</span><div class="trilho"><div class="tr"><i></i></div><i class="mc"></i></div><b class="tab"></b></div>
+    </div>
+    <div class="painel">
+      <h3>SEPARAÇÃO · AJUSTE FINO</h3>
+      <div class="linha verm" data-param="posFiltro"><span class="rot">Pós-filtro</span><div class="trilho"><div class="tr"><i></i></div><i class="mc"></i></div><b class="tab"></b></div>
+      <div class="linha verm" data-param="limiarRuido"><span class="rot">Limiar ruído</span><div class="trilho"><div class="tr"><i></i></div><i class="mc"></i></div><b class="tab"></b></div>
+      <p class="explica">Pós-filtro deixa o fundo mais limpo entre as falas. Limiar alto limpa mais as pausas, mas pode comer respiração.</p>
+    </div>
+    <div class="botoes"><button id="restaurar" class="btn">RESTAURAR PADRÃO</button><button id="fechar" class="btn cheio">FECHAR</button></div>
+  </div>
+
+  <script>
+    // relata erros e o carregamento ao plugin (conferência dos testes)
+    window.__decantaErros = [];
+    window.addEventListener("error", (e) => window.__decantaErros.push(String(e.message) + " @" + e.lineno));
+    window.addEventListener("unhandledrejection", (e) => window.__decantaErros.push("promessa: " + String(e.reason)));
+    setTimeout(() => {
+      if (!window.__JUCE__) return;
+      const resumo = { ok: !!window.__decantaOk, erros: window.__decantaErros, ...(window.__decantaResumo ? window.__decantaResumo() : {}) };
+      window.__JUCE__.backend.emitEvent("__juce__invoke", { name: "janelaPronta", params: [JSON.stringify(resumo)], resultId: 1 });
+    }, 2500);
+  </script>
+  <script src="juce.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

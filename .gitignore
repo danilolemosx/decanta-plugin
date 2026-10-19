@@ -1,0 +1,9 @@
+# código do Decanta (repositório próprio: danilolemosx/tratamento-audio-app)
+/decanta/
+# compilação
+/build/
+/ponte/target/
+.DS_Store
+
+# configuração local (caminho da pasta de compilação nesta máquina)
+/ponte/.cargo/

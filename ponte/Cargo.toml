@@ -1,0 +1,32 @@
+[package]
+name = "decanta-ponte"
+description = "Ponte entre o motor do Decanta e o plugin AAX (AudioSuite): funções em C"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[lib]
+name = "decanta_ponte"
+# staticlib: ligada ao plugin C++; rlib: usada pelos testes
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+tratamento-motor = { path = "../motor" }
+# mesma versão usada pelo motor (só para a reamostragem de volta à taxa do projeto)
+deep_filter = { git = "https://github.com/Rikorose/DeepFilterNet", tag = "v0.5.6", default-features = false, features = ["tract", "default-model"] }
+ndarray = "0.15"
+anyhow = "1.0"
+rubato = "0.16"
+
+# Mesmo perfil do Decanta
+[profile.release]
+debug = false
+opt-level = 3
+lto = "thin"
+panic = "abort"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.dev.package.tratamento-motor]
+opt-level = 3

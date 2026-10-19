@@ -1,0 +1,134 @@
+name: Plugin
+
+# Compila o Decanta (VST3, AU, AAX sem assinatura) para Mac (Apple + Intel) e Windows, e testa:
+# testes da ponte, pluginval, e o som do plugin compilado igual ao do motor, bit a bit.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  JUCE_VERSAO: "8.0.9"
+  PLUGINVAL_VERSAO: "v1.0.4"
+
+jobs:
+  mac:
+    name: macOS (Apple + Intel)
+    runs-on: macos-latest
+    env:
+      CARGO_TARGET_DIR: ${{ github.workspace }}/ponte/target
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ponte
+      - name: JUCE
+        run: git clone -q --depth 1 --branch "$JUCE_VERSAO" https://github.com/juce-framework/JUCE.git "$RUNNER_TEMP/JUCE"
+      - name: Testes da ponte (motor, tempo real, compressor)
+        working-directory: ponte
+        run: cargo test --release
+      - name: Configurar
+        run: >
+          cmake -B build -S juce -DCMAKE_BUILD_TYPE=Release -DDECANTA_UNIVERSAL=ON
+          -DJUCE_DIR="$RUNNER_TEMP/JUCE" -DPONTE_TARGET_DIR="$CARGO_TARGET_DIR"
+      - name: Compilar
+        run: cmake --build build --target Decanta_VST3 Decanta_AU Decanta_AAX testa-plugin -j 4
+      - name: Conferir arquiteturas (Apple + Intel)
+        run: |
+          lipo -info build/Decanta_artefacts/Release/VST3/Decanta.vst3/Contents/MacOS/Decanta
+          lipo -info build/Decanta_artefacts/Release/VST3/Decanta.vst3/Contents/MacOS/Decanta | grep -q "x86_64 arm64\|arm64 x86_64"
+      - name: Instalar no usuário (para o pluginval e o auval)
+        run: |
+          mkdir -p ~/Library/Audio/Plug-Ins/VST3 ~/Library/Audio/Plug-Ins/Components
+          ditto build/Decanta_artefacts/Release/VST3/Decanta.vst3 ~/Library/Audio/Plug-Ins/VST3/Decanta.vst3
+          ditto build/Decanta_artefacts/Release/AU/Decanta.component ~/Library/Audio/Plug-Ins/Components/Decanta.component
+          killall -9 AudioComponentRegistrar || true
+      - name: Som do plugin igual ao do motor (bit a bit)
+        run: |
+          T=build/testa-plugin_artefacts/Release/testa-plugin
+          W="test-audio/gravacao-teste-decanta.wav"
+          $T ~/Library/Audio/Plug-Ins/VST3/Decanta.vst3 "$W" "$RUNNER_TEMP/vst3.wav" 512
+          $T ~/Library/Audio/Plug-Ins/Components/Decanta.component "$W" "$RUNNER_TEMP/au.wav" 1000
+          cd ponte
+          for f in vst3 au; do
+            r=$(cargo run -q --release --example compara_plugin -- "../$W" "$RUNNER_TEMP/$f.wav" voz)
+            echo "$f: $r"
+            echo "$r" | grep -q " 0 diferentes"
+          done
+      - name: pluginval e auval
+        run: |
+          curl -sL -o pv.zip "https://github.com/Tracktion/pluginval/releases/download/$PLUGINVAL_VERSAO/pluginval_macOS.zip"
+          unzip -q pv.zip
+          ./pluginval.app/Contents/MacOS/pluginval --strictness-level 7 --validate-in-process --skip-gui-tests --timeout-ms 600000 --validate ~/Library/Audio/Plug-Ins/VST3/Decanta.vst3
+          ./pluginval.app/Contents/MacOS/pluginval --strictness-level 7 --validate-in-process --skip-gui-tests --timeout-ms 600000 --validate ~/Library/Audio/Plug-Ins/Components/Decanta.component
+          auval -v aufx Dcnt DnLm | tail -3
+      - name: Empacotar
+        run: |
+          mkdir -p pacote
+          ditto build/Decanta_artefacts/Release/VST3/Decanta.vst3 pacote/Decanta.vst3
+          ditto build/Decanta_artefacts/Release/AU/Decanta.component pacote/Decanta.component
+          ditto build/Decanta_artefacts/Release/AAX/Decanta.aaxplugin "pacote/Decanta.aaxplugin (sem assinatura)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Decanta-mac
+          path: pacote
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    env:
+      CARGO_TARGET_DIR: ${{ github.workspace }}\ponte\target
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ponte
+      - name: JUCE
+        run: git clone -q --depth 1 --branch "$JUCE_VERSAO" https://github.com/juce-framework/JUCE.git "$RUNNER_TEMP/JUCE"
+      - name: WebView2 (janela em HTML)
+        shell: pwsh
+        run: |
+          Register-PackageSource -ProviderName NuGet -Name nugetRepository -Location https://www.nuget.org/api/v2 -Force | Out-Null
+          Install-Package Microsoft.Web.WebView2 -Scope CurrentUser -RequiredVersion 1.0.1901.177 -Source nugetRepository -Force | Out-Null
+      - name: Testes da ponte (motor, tempo real, compressor)
+        working-directory: ponte
+        run: cargo test --release
+      - name: Configurar
+        run: >
+          cmake -B build -S juce -A x64
+          -DJUCE_DIR="$RUNNER_TEMP/JUCE" -DPONTE_TARGET_DIR="$CARGO_TARGET_DIR"
+      - name: Compilar
+        run: cmake --build build --config Release --target Decanta_VST3 Decanta_AAX testa-plugin -- -m
+      - name: Som do plugin igual ao do motor (bit a bit)
+        run: |
+          T=build/testa-plugin_artefacts/Release/testa-plugin.exe
+          W="test-audio/gravacao-teste-decanta.wav"
+          $T build/Decanta_artefacts/Release/VST3/Decanta.vst3 "$W" "$RUNNER_TEMP/vst3.wav" 512
+          cd ponte
+          r=$(cargo run -q --release --example compara_plugin -- "../$W" "$RUNNER_TEMP/vst3.wav" voz)
+          echo "vst3: $r"
+          echo "$r" | grep -q " 0 diferentes"
+      - name: pluginval
+        run: |
+          curl -sL -o pv.zip "https://github.com/Tracktion/pluginval/releases/download/$PLUGINVAL_VERSAO/pluginval_Windows.zip"
+          unzip -q pv.zip
+          ./pluginval.exe --strictness-level 7 --validate-in-process --skip-gui-tests --timeout-ms 600000 --validate build/Decanta_artefacts/Release/VST3/Decanta.vst3
+      - name: Empacotar
+        run: |
+          mkdir -p pacote
+          cp -R build/Decanta_artefacts/Release/VST3/Decanta.vst3 pacote/
+          cp -R build/Decanta_artefacts/Release/AAX/Decanta.aaxplugin "pacote/Decanta.aaxplugin (sem assinatura)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Decanta-windows
+          path: pacote

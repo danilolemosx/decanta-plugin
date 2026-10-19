@@ -1,0 +1,1 @@
+2cdc89d Decanta v0.4.0: tela única no estilo bilhete, exportação única por arquivo, ajustes avançados

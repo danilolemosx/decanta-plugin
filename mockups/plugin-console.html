@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Decanta Plugin · propostas</title>
+<style>
+@font-face { font-family: "Archivo"; src: url("fonts/archivo.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; }
+:root {
+  --fundo: #2e2d2b; --fundo2: #3a3835; --papel: #efe5cf; --papel2: #e4d8bd; --tinta: #34312d; --tinta2: #6e665a;
+  --linha: #c9bb9c; --verm: #d2382f; --apagado: #a49c8c; --ok: #3c7a4b; --ok-claro: #8fd9a8; --ambar: #c9902e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #1b1a19; color: var(--papel); font: 500 13px/1.35 "Archivo", sans-serif; padding: 28px 30px 34px; width: 620px; }
+.rot { font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tinta2); white-space: nowrap; }
+.tab { font-variant-numeric: tabular-nums; }
+
+h1 { font-size: 26px; font-weight: 900; font-stretch: 125%; letter-spacing: 1px; }
+h1 span { color: var(--verm); }
+.intro { display: flex; align-items: flex-end; gap: 22px; margin-bottom: 22px; }
+.intro p { color: var(--apagado); font-size: 13px; max-width: 900px; border-left: 2px solid var(--verm); padding-left: 12px; }
+
+.grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; align-items: start; }
+.proposta > h2 { font-size: 15px; font-weight: 900; font-stretch: 120%; letter-spacing: 1.2px; margin-bottom: 4px; }
+.proposta > h2 b { color: var(--verm); }
+.proposta > .desc { color: var(--apagado); font-size: 12px; margin-bottom: 12px; min-height: 32px; }
+
+/* ---- janela do host (Media Composer AudioSuite, simplificado) ---- */
+.host { background: #4a4d52; border-radius: 6px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+.host-barra { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: #5b5f65; color: #e8e8e8; font: 600 10.5px/1 -apple-system, "Segoe UI", sans-serif; }
+.host-barra .sel { background: #3b3e42; border: 1px solid #2c2e31; border-radius: 3px; padding: 4px 18px 4px 6px; position: relative; }
+.host-barra .sel::after { content: "▾"; position: absolute; right: 5px; top: 3px; font-size: 9px; }
+.host-barra .esp { flex: 1; }
+.host-barra .bt { background: #3b3e42; border: 1px solid #2c2e31; border-radius: 3px; padding: 4px 9px; }
+.host-barra .bt.forte { background: #2f6fb5; border-color: #23558b; }
+.host-titulo { font: 600 10px/1 -apple-system, sans-serif; color: #cfd2d6; padding: 5px 8px; background: #3e4146; letter-spacing: .3px; }
+
+.notas { margin-top: 12px; display: grid; gap: 6px; }
+.nota { display: flex; gap: 8px; font-size: 12px; color: #d9d0bd; }
+.nota i { font-style: normal; flex: 0 0 auto; width: 62px; font-size: 9.5px; font-weight: 800; letter-spacing: 1.2px; color: var(--fundo); background: var(--apagado); border-radius: 3px; text-align: center; padding: 2px 0; height: 16px; margin-top: 1px; }
+.nota i.av { background: #8fb3dc; }
+.nota i.pr { background: #c7a3ec; }
+
+/* medidores */
+.medidor { width: 7px; border-radius: 2px; background: #1a1918; position: relative; overflow: hidden; }
+.medidor::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: var(--n); background: linear-gradient(to top, var(--ok-claro) 0 70%, var(--ambar) 70% 88%, var(--verm) 88%); }
+.medidores { display: flex; gap: 3px; align-items: stretch; }
+.par-med { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+/* ================= A · BILHETE ================= */
+.a { background: var(--fundo); padding: 12px; display: flex; flex-direction: column; gap: 10px; height: 330px; }
+.a .topo { display: flex; align-items: center; gap: 10px; }
+.marca { font-size: 19px; font-weight: 900; font-stretch: 125%; letter-spacing: .5px; line-height: 1; }
+.marca span { color: var(--verm); }
+.selo { font-size: 9px; font-weight: 800; letter-spacing: 1.3px; border: 1.5px solid var(--ok-claro); color: var(--ok-claro); padding: 3px 6px; border-radius: 3px; }
+.engrenagem { margin-left: auto; width: 26px; height: 26px; border: 2px solid #6b665e; border-radius: 5px; color: #cfc6b4; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.a .cartao { flex: 1; background: var(--papel); color: var(--tinta); border-radius: 9px; display: flex; overflow: hidden; }
+.a .faders { display: flex; gap: 14px; padding: 12px 14px; border-right: 2px dashed var(--linha); }
+.fader { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 54px; }
+.fader .trilho { position: relative; flex: 1; width: 8px; background: var(--papel2); border-radius: 4px; border: 1px solid var(--linha); }
+.fader .cheio { position: absolute; left: -1px; right: -1px; bottom: -1px; border-radius: 4px; background: var(--tinta); }
+.fader .botao { position: absolute; left: 50%; width: 34px; height: 14px; margin-left: -17px; background: var(--tinta); border-radius: 3px; border: 2px solid var(--papel); box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.fader .botao::after { content: ""; position: absolute; left: 6px; right: 6px; top: 4px; height: 2px; background: var(--papel); }
+.fader b { font-size: 15px; font-weight: 800; }
+.fader.verm .cheio { background: var(--verm); }
+.a .limpeza { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.grande { display: flex; align-items: baseline; gap: 4px; }
+.grande b { font-size: 46px; font-weight: 900; font-stretch: 110%; line-height: .9; }
+.grande span { font-size: 13px; font-weight: 700; color: var(--tinta2); }
+.grande em { font-style: normal; margin-left: auto; font-size: 11px; font-weight: 800; letter-spacing: 1.4px; background: var(--tinta); color: var(--papel); padding: 3px 7px; border-radius: 3px; }
+.pilulas { display: flex; gap: 5px; }
+.pilulas button { flex: 1; font: inherit; font-size: 10.5px; font-weight: 800; letter-spacing: 1px; border: 2px solid var(--tinta); border-radius: 5px; background: none; color: var(--tinta); padding: 5px 0; }
+.pilulas button.ativo { background: var(--tinta); color: var(--papel); }
+.reguinha { position: relative; height: 18px; }
+.reguinha .tr { position: absolute; left: 0; right: 0; top: 7px; height: 4px; border-radius: 2px; background: var(--linha); }
+.reguinha .tr i { position: absolute; left: 0; top: 0; bottom: 0; width: 20%; background: var(--verm); border-radius: 2px; }
+.reguinha .mc { position: absolute; top: 1px; left: 20%; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: var(--verm); border: 3px solid var(--papel); box-shadow: 0 0 0 1.5px var(--verm); }
+.ouvir { display: flex; border: 2px solid var(--tinta); border-radius: 6px; overflow: hidden; margin-top: auto; }
+.ouvir button { flex: 1; font: inherit; font-size: 10.5px; font-weight: 800; letter-spacing: 1.1px; background: none; border: none; border-right: 2px solid var(--tinta); color: var(--tinta); padding: 6px 0; }
+.ouvir button:last-child { border-right: none; }
+.ouvir button.ativo { background: var(--verm); color: var(--papel); }
+.a .lado { padding: 12px 10px 12px 0; display: flex; }
+.a .lado .medidores { height: 100%; }
+.a .rod { display: flex; justify-content: space-between; font-size: 10px; color: var(--apagado); font-weight: 600; letter-spacing: .5px; }
+
+/* ================= B · CONSOLE ================= */
+.b { background: linear-gradient(#262523, #1d1c1b); padding: 12px 14px; height: 360px; display: flex; flex-direction: column; gap: 6px; }
+.b .topo { display: flex; align-items: center; gap: 10px; }
+.b .selo { border-color: #8fb3dc; color: #8fb3dc; }
+.b .corpo { flex: 1; display: flex; align-items: center; gap: 8px; }
+.b .knobs { flex: 1; display: grid; grid-template-columns: 1fr 1.25fr 1fr; align-items: end; gap: 4px; }
+.knob { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.knob svg { display: block; }
+.knob .v { font-size: 16px; font-weight: 800; color: var(--papel); }
+.knob .n { font-size: 9.5px; font-weight: 800; letter-spacing: 1.6px; color: var(--apagado); }
+.knob.centro .v { font-size: 20px; }
+.knob .leg { font-size: 10.5px; color: #8d8577; text-align: center; line-height: 1.25; margin-top: 2px; min-height: 26px; }
+.b .pe { display: flex; gap: 8px; align-items: center; }
+.tecla { font: inherit; font-size: 10px; font-weight: 800; letter-spacing: 1.2px; color: #cfc6b4; background: #34322f; border: 1px solid #47443f; border-radius: 4px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; }
+.tecla .led { width: 7px; height: 7px; border-radius: 50%; background: #4b4844; }
+.tecla.ligada { color: var(--papel); border-color: var(--verm); }
+.tecla.ligada .led { background: var(--verm); box-shadow: 0 0 6px var(--verm); }
+.b .pilulas button { border-color: #4a4742; color: #b8af9d; font-size: 9.5px; padding: 4px 0; }
+.b .pilulas button.ativo { background: var(--verm); border-color: var(--verm); color: var(--papel); }
+.b .rod { display: flex; justify-content: space-between; font-size: 10px; color: #7d766a; font-weight: 600; }
+.b .par-med .rot { color: #7d766a; }
+.b .medidores { height: 170px; }
+
+/* ================= C · TIRA ================= */
+.c { background: var(--fundo); padding: 12px; display: flex; flex-direction: column; gap: 9px; height: 230px; }
+.c .topo { display: flex; align-items: center; gap: 10px; }
+.c .selo { border-color: #c7a3ec; color: #c7a3ec; }
+.c .linhas { background: var(--papel); color: var(--tinta); border-radius: 8px; padding: 10px 12px; display: grid; grid-template-columns: 82px 1fr 58px; align-items: center; gap: 9px 10px; }
+.c .linhas .rot { color: var(--tinta2); }
+.c .linhas b { font-size: 14px; font-weight: 800; text-align: right; }
+.barra { position: relative; height: 18px; }
+.barra .tr { position: absolute; left: 0; right: 0; top: 7px; height: 4px; background: var(--linha); border-radius: 2px; }
+.barra .tr i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--tinta); border-radius: 2px; }
+.barra .mc { position: absolute; top: 1px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: var(--tinta); border: 3px solid var(--papel); box-shadow: 0 0 0 1.5px var(--tinta); }
+.barra.verm .tr i, .barra.verm .mc { background: var(--verm); }
+.barra.verm .mc { box-shadow: 0 0 0 1.5px var(--verm); }
+.c .pilulas button { padding: 3px 0; font-size: 10px; }
+.c .pe { display: flex; gap: 8px; align-items: center; }
+.c .pe .tecla { background: none; border: 2px solid #6b665e; }
+.c .pe .tecla.ligada { border-color: var(--verm); }
+.c .mini-med { display: flex; flex-direction: column; gap: 3px; margin-left: auto; width: 120px; }
+.c .mini-med div { height: 5px; border-radius: 2px; background: #1a1918; position: relative; overflow: hidden; }
+.c .mini-med div::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: var(--n); background: linear-gradient(to right, var(--ok-claro) 0 70%, var(--ambar) 70% 88%, var(--verm) 88%); }
+
+/* premiere: painel de controles de efeito */
+.premiere { margin-top: 14px; background: #232323; border-radius: 6px; border: 1px solid #3a3a3a; font: 500 11px/1.2 -apple-system, "Segoe UI", sans-serif; color: #c8c8c8; overflow: hidden; }
+.premiere .cab { background: #2d2d2d; padding: 6px 9px; display: flex; gap: 8px; color: #9e9e9e; font-weight: 600; }
+.premiere .cab b { color: #e2e2e2; }
+.premiere .lin { display: flex; align-items: center; padding: 5px 9px 5px 22px; gap: 8px; border-top: 1px solid #2c2c2c; }
+.premiere .lin span:first-child { flex: 1; }
+.premiere .lin .val { color: #4ea6ff; font-variant-numeric: tabular-nums; }
+.premiere .lin .edit { border: 1px solid #555; border-radius: 3px; padding: 2px 8px; color: #ddd; }
+.premiere .fx { padding: 6px 9px; display: flex; gap: 6px; align-items: center; color: #e2e2e2; font-weight: 600; }
+.premiere .fx i { font-style: normal; color: #bbb; }
+
+.rodape-doc { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+.caixa-doc { border: 1.5px solid #3f3c38; border-radius: 8px; padding: 14px 16px; }
+.caixa-doc h3 { font-size: 11px; font-weight: 800; letter-spacing: 1.6px; color: var(--verm); margin-bottom: 8px; }
+.caixa-doc li { list-style: none; color: #d9d0bd; font-size: 12.5px; padding: 3px 0 3px 14px; position: relative; }
+.caixa-doc li::before { content: ""; position: absolute; left: 0; top: 10px; width: 6px; height: 2px; background: var(--apagado); }
+.caixa-doc li b { color: var(--papel); }
+</style>
+</head>
+<body>
+<div class="intro" style="margin-bottom:16px"><h1>DECANTA<span>.</span> PLUGIN</h1></div>
+<!-- ================= B ================= -->
+  <section class="proposta">
+    <h2><b>B</b> · CONSOLE</h2>
+    <p class="desc">Escolhido. Sem os atalhos Leve/Médio/Forte: os botões ganham nomes que explicam o que fazem.</p>
+    <div class="host">
+      <div class="host-barra"><span class="sel">Decanta</span><span class="sel">Create New ▾</span><span class="sel">Clip</span><span class="esp"></span><span class="bt">Preview</span><span class="bt forte">Render</span></div>
+      <div class="b">
+        <div class="topo"><div class="marca">DECANTA<span>.</span></div><span class="selo" style="border-color:var(--ok-claro);color:var(--ok-claro)">CLIP INTEIRO · IGUAL AO APP</span><div class="engrenagem">⚙</div></div>
+        <div class="corpo">
+          <div class="par-med"><div class="medidores"><i class="medidor" style="--n:74%"></i><i class="medidor" style="--n:66%"></i></div><span class="rot">ENTRA</span></div>
+          <div class="knobs">
+            <div class="knob">
+              <svg class="dial" data-cor="#efe5cf" data-valor="0.9" width="92" height="92" viewBox="0 0 100 100"></svg>
+              <span class="v tab">0 dB</span><span class="n">VOZ</span><span class="leg">volume da fala limpa</span>
+            </div>
+            <div class="knob centro">
+              <svg class="dial" data-cor="#d2382f" data-valor="0.2" width="122" height="122" viewBox="0 0 100 100"></svg>
+              <span class="v tab">20 dB</span><span class="n">SEPARAÇÃO</span><span class="leg">o quanto separar<br>a voz do fundo</span>
+            </div>
+            <div class="knob">
+              <svg class="dial" data-cor="#c9902e" data-valor="0.55" width="92" height="92" viewBox="0 0 100 100"></svg>
+              <span class="v tab">−18 dB</span><span class="n">AMBIÊNCIA</span><span class="leg">volume do fundo retirado</span>
+            </div>
+          </div>
+          <div class="par-med"><div class="medidores"><i class="medidor" style="--n:60%"></i><i class="medidor" style="--n:52%"></i></div><span class="rot">SAI</span></div>
+        </div>
+        <div class="pe">
+          <span class="tecla"><i class="led"></i>SÓ RETIRADO</span><span style="flex:1"></span><span class="rod" style="gap:6px"><span>Clip novo: <b style="color:var(--papel)">CENA12_T3_DF20</b></span></span>
+        </div>
+        <div class="rod"><span>Atalho: segure ⌥ e clique num botão para voltar ao padrão</span><span>DeepFilterNet 0.5.6</span></div>
+      </div>
+    </div>
+    <div class="notas">
+      <div class="nota"><i class="av">AVID</i><span>AudioSuite: selecione o clip, ajuste e clique <b>Render</b>. Também dá para pôr na faixa e ouvir em tempo real; aí o selo vira “TEMPO REAL · 30 MS”.</span></div>
+      <div class="nota"><i class="pr">PREMIERE</i><span>Efeito no clip, como um EQ. Na exportação, processa do começo e fica estável.</span></div>
+    </div>
+  </section>
+
+  
+<script>
+// botão giratório: 270° de curso, de −135° (mínimo) a +135° (máximo), 0° = para cima
+function ponto(r, graus) { const a = (graus - 90) * Math.PI / 180; return [50 + r * Math.cos(a), 50 + r * Math.sin(a)]; }
+function arco(r, de, ate) {
+  const [x1, y1] = ponto(r, de), [x2, y2] = ponto(r, ate);
+  return `M${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 ${ate - de > 180 ? 1 : 0} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+document.querySelectorAll("svg.dial").forEach(svg => {
+  const v = parseFloat(svg.dataset.valor), cor = svg.dataset.cor, ang = -135 + 270 * v;
+  const [px, py] = ponto(19, ang);
+  svg.innerHTML =
+    `<path d="${arco(40, -135, 135)}" fill="none" stroke="#3a3835" stroke-width="6" stroke-linecap="round"/>` +
+    (v > 0 ? `<path d="${arco(40, -135, ang)}" fill="none" stroke="${cor}" stroke-width="6" stroke-linecap="round"/>` : "") +
+    `<circle cx="50" cy="50" r="28" fill="#34322f" stroke="#4a4742" stroke-width="1.5"/>` +
+    `<line x1="50" y1="50" x2="${px.toFixed(2)}" y2="${py.toFixed(2)}" stroke="#efe5cf" stroke-width="4" stroke-linecap="round"/>`;
+});
+</script>
+</body>
+</html>
