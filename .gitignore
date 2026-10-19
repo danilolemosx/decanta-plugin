@@ -7,3 +7,7 @@
 
 # configuração local (caminho da pasta de compilação nesta máquina)
 /ponte/.cargo/
+
+# dados locais de assinatura e pacotes gerados
+/scripts/assinatura.local
+/dist/
