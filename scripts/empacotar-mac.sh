@@ -36,6 +36,13 @@ mkdir -p "$RAIZ/Library/Audio/Plug-Ins/VST3" "$RAIZ/Library/Audio/Plug-Ins/Compo
 ditto "$ORIGEM/Decanta.vst3" "$RAIZ/Library/Audio/Plug-Ins/VST3/Decanta.vst3"
 ditto "$ORIGEM/Decanta.component" "$RAIZ/Library/Audio/Plug-Ins/Components/Decanta.component"
 
+echo "== assinando VST3 e AU (certificado do Mac)"
+# o JUCE grava o moduleinfo.json do VST3 depois de assinar, e o AU universal vem sem assinatura
+for p in "$RAIZ/Library/Audio/Plug-Ins/VST3/Decanta.vst3" "$RAIZ/Library/Audio/Plug-Ins/Components/Decanta.component"; do
+	codesign --force --sign "$SIGN_ID" --timestamp=none "$p"
+	codesign --verify --strict "$p"
+done
+
 echo "== assinando o AAX (PACE)"
 ditto "$AAX_ORIGEM" "$TMP/Decanta.aaxplugin"
 "$WRAPTOOL" sign --customernumber "$PACE_CUSTOMER_NUMBER" --customername "$PACE_CUSTOMER_NAME" \
