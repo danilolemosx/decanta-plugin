@@ -1,0 +1,81 @@
+DECANTA 0.1.0 — limpeza de diálogo, como plugin
+===============================================
+
+O QUE É
+O Decanta separa a voz do ruído de fundo com o DeepFilterNet, direto no programa de edição.
+Funciona como AudioSuite e ao vivo no Avid Media Composer e no Pro Tools (AAX), e como plugin
+no Premiere, no DaVinci Resolve (VST3) e no Logic (AU). Mac e Windows.
+Roda no computador, sem internet.
+
+
+COMO USAR
+Media Composer ou Pro Tools, no clip (AudioSuite):
+1. Selecione o clip ou o trecho na timeline.
+2. Abra o AudioSuite e escolha Decanta.
+3. Ajuste os botões e ouça no Preview.
+4. Clique em Render. O clip novo substitui o original na timeline.
+
+Ao vivo (Media Composer, Pro Tools, Premiere, Resolve, Logic):
+1. Ponha o Decanta num insert da faixa de diálogo.
+2. Dê play e ajuste. Leva um instante para "pegar" depois do play.
+
+OS BOTÕES
+- SEPARAÇÃO: o quanto separar a voz do fundo. 20 dB é o padrão; mais que isso limpa mais,
+  mas a voz pode ficar "cortada".
+- VOZ: volume da fala limpa.
+- AMBIÊNCIA: volume do fundo que foi retirado. Em −∞, só sobra a voz.
+  Voz e Ambiência no máximo devolvem o som original.
+- COMPRESSÃO e GANHO: compressor só na voz, para o fundo não subir junto.
+  Os controles completos (Threshold, Ratio, Attack, Release, Knee) ficam na engrenagem (⚙).
+- SÓ FUNDO: para ouvir só o que está sendo retirado.
+
+BOM SABER
+- Um limitador de proteção fica sempre ligado: quando o volume sobe, a saída nunca passa de 0 dBFS.
+- Funciona em qualquer taxa, de 8 a 192 kHz.
+- O plugin atrasa o som em 40 ms e avisa o programa, que compensa sozinho. A sincronia não muda.
+
+
+QUAL ARQUIVO BAIXAR
+- Mac (chip Apple ou Intel, macOS 11 ou mais novo): Decanta-0.1.0-mac.pkg
+  Instala AAX, VST3 e AU de uma vez.
+- Windows 10/11:                                    Decanta-0.1.0-windows-vst3.zip
+  Só VST3 (Premiere, Resolve). O AAX de Windows ainda não existe.
+
+
+INSTALAR NO MAC
+1. Feche o Media Composer, o Pro Tools e os outros programas de edição.
+2. Abra o Decanta-0.1.0-mac.pkg e siga o instalador. Ele pede a senha do Mac.
+3. Abra o programa de edição de novo. O Decanta aparece na lista de plugins.
+
+O instalador não é assinado pela Apple, então o Mac reclama na primeira vez. É normal:
+
+> "O Decanta-0.1.0-mac.pkg não pode ser aberto" / "A Apple não pôde verificar…"
+  1. Tente abrir o .pkg uma vez e clique em OK.
+  2. Vá em Ajustes do Sistema > Privacidade e Segurança.
+  3. No fim da página, clique em "Abrir Mesmo Assim" e confirme com a senha.
+
+> O Decanta não aparece no Logic
+  Em Logic Pro > Configurações > Plug-in Manager, clique em "Reset & Rescan Selection".
+
+O AAX vai assinado pela PACE, como a Avid exige.
+
+
+INSTALAR NO WINDOWS
+1. Descompacte o Decanta-0.1.0-windows-vst3.zip.
+2. Copie a pasta Decanta.vst3 para C:\Program Files\Common Files\VST3\
+3. Abra o Premiere ou o Resolve de novo.
+
+> O navegador bloqueia o download
+  Nos downloads, clique nos três pontinhos ao lado do arquivo e escolha "Manter".
+
+
+BAIXANDO DO GOOGLE DRIVE
+"O Google Drive não pode verificar este arquivo quanto a vírus": é só pelo tamanho.
+Clique em "Fazer o download assim mesmo".
+
+
+SE DER PROBLEMA
+- O som ficou "cortado" ou metálico: baixe a SEPARAÇÃO ou suba um pouco a AMBIÊNCIA.
+- O plugin não aparece no Avid: confira se o Media Composer estava fechado durante a
+  instalação e abra-o de novo.
+- Mande um print da tela e o nome do programa para o Danilo.
